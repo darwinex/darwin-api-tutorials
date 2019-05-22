@@ -17,7 +17,7 @@
 """
 
 import os
-os.chdir('E:/DARWIN_API_TUTORIALS/PYTHON/')
+os.chdir('<INSERT-PATH-TO-PROJECT-DIR-HERE>')
 
 from RESEARCH.INDICATORS.DWX_Indicator import DWX_Indicator
 
