@@ -17,7 +17,7 @@
 """
 
 import os
-os.chdir('E:/DARWIN_API_TUTORIALS/PYTHON/')
+os.chdir('<INSERT-PATH-TO-PROJECT-DIR-HERE>')
 
 from RESEARCH.INDICATORS.ML.Hurst_Indicator_v1_0 import Hurst_Indicator
 from API.InfoAPI.DWX_Info_API import DWX_Info_API
