@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: May 16, 2019
+    Last Updated: May 29, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
