@@ -188,3 +188,65 @@ class DWX_Info_API(DWX_API):
             print('[ERROR] Please specify symbols as Python list []')    
     
     #########################################################################
+    
+    def _Get_DARWIN_Universe_(self, 
+                          _status='ALL',
+                          _endpoint='/products{}',
+                          _query_string='?status={}&page={}&per_page={}',
+                          _page=0,
+                          _perPage=50,
+                          _iterate=True,
+                          _delay=0.01):
+    
+        # Get first batch
+        try:
+            print('[DarwinInfoAPI] Getting first {} DARWINs..'.format(_perPage))
+            _darwins = self._Call_API_(_endpoint \
+                                      .format(_query_string \
+                                              .format(_status, _page, _perPage)), 
+                                              _type='GET',
+                                              _data='')
+            
+        except Exception as ex:
+            _exstr = "Exception Type {0}. Args:\n{1!r}"
+            _msg = _exstr.format(type(ex).__name__, ex.args)
+            print(_msg)
+            return None
+            
+        if _iterate:
+            
+            # Calculate number of pages
+            _pages = int(_darwins['totalPages'])
+            
+            # Keep 'content' list of DARWINs, discard everything else
+            _darwins = _darwins['content']
+            
+            print('[API] {} pages of {} DARWINs each found.. iterating, stand by! :muscle:\n'
+                  .format(_pages, _perPage))
+            
+            # Iterate
+            for i in range(_page + 1, _pages):
+                
+                print('\r[DarwinInfoAPI] Getting page {} of {}'.format(i+1, _pages), end='', flush=True)
+                
+                try:
+                    _darwins = _darwins + self._Call_API_(_endpoint \
+                                              .format(_query_string \
+                                                      .format(_status, i, _perPage)), 
+                                                      _type='GET',
+                                                      _data='')['content']
+                    
+                    # Sleep until next time
+                    if _delay > 0:
+                        time.sleep(_delay)
+                    
+                except Exception as ex:
+                    _exstr = "Exception Type {0}. Args:\n{1!r}"
+                    _msg = _exstr.format(type(ex).__name__, ex.args)
+                    print(_msg)
+                    continue
+                
+        # Return dict
+        return pd.DataFrame(_darwins)
+        
+    ######################################################################### 
