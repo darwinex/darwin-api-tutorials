@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: May 29, 2019
+    Last Updated: May 31, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
@@ -249,4 +249,95 @@ class DWX_Info_API(DWX_API):
         # Return dict
         return pd.DataFrame(_darwins)
         
+    ######################################################################### 
+
+    """
+    Implementation: 
+        /products (POST) endpoint for algorithmic DARWIN filters
+    
+    Available parameters (as of 2019-05-29):
+        
+        return, drawdown, investors, trades, trader_equity, return_drawdown,
+        divergence, days_in_darwinex, current_investment_usd, var, d-score, 
+        Ex, Mc, Rs, Ra, Os, Cs, R+, R-, Dc, La, Pf, Sc
+        
+        For the complete specification, please see:
+            --
+            https://api.darwinex.com/store/apis/info?name=DarwinInfoAPI
+            &version=1.5&provider=admin#/default/filterProductsUsingPOST
+            
+       
+    Example Usage:
+    
+    # Create API object
+    _info = DWX_Info_API()
+    
+    # 1
+    _info._Get_Filtered_DARWINS_(_filters=[['drawdown',-10,0,'6m'],
+                                         ['return',5,100,'1m']],
+                               _order=['return','12m','DESC'],
+                               _page=0,
+                               _perPage=50)
+    
+    # 2
+    _info._Get_Filtered_DARWINS_(_filters=[['d-score',50,100,'actual']],
+                               _order=['return','12m','DESC'],
+                               _page=0,
+                               _perPage=50)
+    """ 
+    
+    def _Get_Filtered_DARWINS_(self, 
+                               _endpoint='/products',
+                               _filters=[['drawdown',-10,0,'6m'],
+                                         ['return',5,100,'1m']],
+                               _order=['return','12m','DESC'],
+                               _page=0,
+                               _perPage=50,
+                               _delay=0.01):
+        
+        # Construct filter
+        _json = dict(filter=[dict(name=_filters[i][0],
+                                  options=[dict(max=_filters[i][2],
+                                                min=_filters[i][1],
+                                                period=_filters[i][3])]) \
+                            for i in range(len(_filters))],
+                     order=_order[2],
+                     orderField=_order[0],
+                     page=_page,
+                     perPage=_perPage,
+                     period=_order[1])
+    
+        _rets = []
+        
+        # Execute
+        while _json['page'] != -1:
+            
+            print('\r[DarwinInfoAPI] Getting page {} of DARWINs that satisfy criteria..' \
+                  .format(_json['page']), end='', flush=True)
+            
+            try:
+                _ret = self._Call_API_(_endpoint,
+                                      _type='POST',
+                                      _data=str(_json).replace('\'', '"'))
+                
+                if len(_ret) > 0:
+                    
+                    # Update page number
+                    _json['page'] += 1
+                    
+                    # Add output to running list
+                    _rets = _rets + _ret
+                    
+                    # Sleep between calls
+                    time.sleep(_delay)
+                else:
+                    _json['page'] = -1 # done
+                
+            except AssertionError:
+                print('[ERROR] name, period, min and max lists must be the same length.')
+                return None
+       
+        # Return DataFrame
+        return pd.DataFrame(_rets)
+    
     ######################################################################### 
