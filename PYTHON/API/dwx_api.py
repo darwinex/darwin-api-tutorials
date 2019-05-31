@@ -65,7 +65,7 @@ class DWX_API(object):
                     print('Data is empty..')
                     return None
                 
-                _ret = requests.post(_endpoint,
+                _ret = requests.post(self._url + _endpoint,
                                      data=_data,
                                      headers = self._post_headers,
                                      verify=True)
