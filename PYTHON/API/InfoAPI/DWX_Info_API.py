@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: May 31, 2019
+    Last Updated: June 04, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
@@ -339,5 +339,77 @@ class DWX_Info_API(DWX_API):
        
         # Return DataFrame
         return pd.DataFrame(_rets)
+    
+    ######################################################################### 
+    
+    """
+    Example Usage:
+        
+        # from/to dates
+        _info._Get_DARWIN_OHLC_Candles_( _symbols=['KVL'], \
+                                        _from_dt=str(pd.Timestamp('now') \
+                                        - pd.tseries.offsets.BDay(5)), \
+                                        _to_dt=pd.Timestamp('now'), \
+                                        _resolution='1m')['KVL']
+    
+        # timeframes
+        _info._Get_DARWIN_OHLC_Candles_( _symbols=['KVL'], \
+                                        _timeframe='/1D', \
+                                        _resolution='1m')['KVL']
+                                        
+    """
+    def _Get_DARWIN_OHLC_Candles_(self, 
+                             _symbols=['KVL'],
+                             _resolution='1m', # 1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1mn
+                             _from_dt='2019-05-31 12:00:00', # UTC
+                             _to_dt=str(pd.Timestamp('now')),
+                             _timeframe='/1D', # 1D, 1W, 1M, 3M, 6M, 1Y, 2Y, ALL
+                             _endpoint='/products/{}/candles{}',
+                             _delay=0.01):
+    
+        # from/to endpoint given priority. change as necessary.
+        if _from_dt != '':
+            
+            # Convert human-readable datetimes to millisecond EPOCHs
+            _from_epoch = int(pd.Timestamp(_from_dt).timestamp())
+            _to_epoch = int(pd.Timestamp(_to_dt).timestamp())
+        
+            _query_string = f'?resolution={_resolution}&from={_from_epoch}\
+                             &to={_to_epoch}'
+        
+        elif _timeframe != '':
+            _query_string = f'{_timeframe}?resolution={_resolution}'
+        
+        else:
+            print('[KERNEL] Inputs not recognized.. please try again.')
+            return None
+            
+        _candles = {}
+        
+        for _darwin in _symbols:
+            
+            try:
+                print('[DarwinInfoAPI] Getting Candles for {}..'.format(_darwin))
+                _d = self._Call_API_(_endpoint \
+                                          .format(_darwin, 
+                                                  _query_string), 
+                                                  _type='GET',
+                                                  _data='')
+                
+                # Parse data into DataFrame
+                _candles[_darwin] = pd.DataFrame(
+                        data=[_row['candle'] for _row in _d['candles']],
+                        index=[_row['timestamp'] for _row in _d['candles']])
+                
+                # Convert timestamp EPOCHs to human-readable datetimes
+                _candles[_darwin].index = pd.to_datetime(_candles[_darwin].index, unit='s')
+                
+            except Exception as ex:
+                _exstr = "Exception Type {0}. Args:\n{1!r}"
+                _msg = _exstr.format(type(ex).__name__, ex.args)
+                print(_msg)
+                return None
+        
+        return _candles
     
     ######################################################################### 
