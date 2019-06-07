@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: June 04, 2019
+    Last Updated: June 07, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
@@ -29,8 +29,8 @@ pd.set_option('display.max_columns', 500)
 
 class DWX_Info_API(DWX_API):
     
-    def __init__(self):
-        super(DWX_Info_API, self).__init__()
+    def __init__(self, **kwargs):
+        super(DWX_Info_API, self).__init__(**kwargs)
         self._graphics = DWX_Graphics_Helpers()
         
     #########################################################    
@@ -42,6 +42,7 @@ class DWX_Info_API(DWX_API):
                                _end='', #_end=pd.to_datetime('today'),
                                _endpoint='/products/{}/history/quotes',
                                _plot_title='DWX_Info_API: def _Get_Quotes_() Example',
+                               _plot=False,
                                _delay=0.01):
         
         if isinstance(_symbols, list):
@@ -51,7 +52,8 @@ class DWX_Info_API(DWX_API):
             
             for darwin in _symbols:
                 
-                print('\n[DarwinInfoAPI] Processing {} / {}: ${}'.format(_count, len(_symbols), darwin))
+                print('\r[DarwinInfoAPI] Getting Quotes for DARWIN {} / {}: ${}'.format(_count, len(_symbols), darwin), 
+                      end='', flush=True)
                 
                 try:
                     
@@ -98,7 +100,7 @@ class DWX_Info_API(DWX_API):
             _retdf = pd.concat([_df for _df in _dict.values() if isinstance(_df, pd.DataFrame)], axis=1)
             _retdf.columns = _symbols
             
-            if _plot_title != '':
+            if _plot:
                 self._graphics._plotly_dataframe_scatter_(_custom_filename='example_quotes.html', 
                                                           _dir_prefix='MISC/', 
                                                           _df=_retdf,
@@ -118,6 +120,7 @@ class DWX_Info_API(DWX_API):
                                 _symbols=['THA.4.12','LVS.4.20'], 
                                 _endpoint='/products/{}/history/badges',
                                 _plot_title='DWX_Info_API: def _Get_Historical_Scores_() Example',
+                                _plot=False,
                                 _delay=0.01):
         
         if isinstance(_symbols, list):
@@ -133,7 +136,8 @@ class DWX_Info_API(DWX_API):
             
             for darwin in _symbols:
                 
-                print('\n[DarwinInfoAPI] Processing {} / {}: ${}'.format(_count, len(_symbols), darwin))
+                print('\r[DarwinInfoAPI] Getting Scores for DARWIN {} / {}: ${}'.format(_count, len(_symbols), darwin),
+                      end='', flush=True)
                 
                 try:
             
@@ -174,10 +178,11 @@ class DWX_Info_API(DWX_API):
             # If only one symbol provided, plot scores via Plotly
             if len(_symbols) == 1:
                 
-                if _plot_title != '':
+                if _plot:
                     self._graphics._plotly_dataframe_scatter_(_custom_filename='example_scores.html', 
                                                               _dir_prefix='MISC/', 
-                                                              _df=_dict[_symbols[0]].drop(['fcal_ts','lcal_ts','Ds','Dp'], axis=1).loc[:, ],
+                                                              _df=_dict[_symbols[0]].drop(['fcal_ts','lcal_ts','Ds','Dp'], 
+                                                                       axis=1).loc[:, ],
                                                               _x_title='EOD Timestamp',
                                                               _y_title='Score / Investment Attribute',
                                                               _main_title=_plot_title)
@@ -236,7 +241,7 @@ class DWX_Info_API(DWX_API):
                                                       _type='GET',
                                                       _data='')['content']
                     
-                    # Sleep until next time
+                    # Sleep my child.. until next time..
                     if _delay > 0:
                         time.sleep(_delay)
                     
@@ -249,13 +254,11 @@ class DWX_Info_API(DWX_API):
         # Return dict
         return pd.DataFrame(_darwins)
         
-    ######################################################################### 
-
-    """
-    Implementation: 
-        /products (POST) endpoint for algorithmic DARWIN filters
     
-    Available parameters (as of 2019-05-29):
+    ######################################################################### 
+        
+    """
+    Available filters (as of 2019-05-29):
         
         return, drawdown, investors, trades, trader_equity, return_drawdown,
         divergence, days_in_darwinex, current_investment_usd, var, d-score, 
@@ -341,14 +344,14 @@ class DWX_Info_API(DWX_API):
         return pd.DataFrame(_rets)
     
     ######################################################################### 
-    
+
     """
     Example Usage:
         
         # from/to dates
         _info._Get_DARWIN_OHLC_Candles_( _symbols=['KVL'], \
                                         _from_dt=str(pd.Timestamp('now') \
-                                        - pd.tseries.offsets.BDay(5)), \
+                                        - pd.tseries.offsets.BDay(7)), \
                                         _to_dt=pd.Timestamp('now'), \
                                         _resolution='1m')['KVL']
     
@@ -368,6 +371,7 @@ class DWX_Info_API(DWX_API):
                              _delay=0.01):
     
         # from/to endpoint given priority. change as necessary.
+        
         if _from_dt != '':
             
             # Convert human-readable datetimes to millisecond EPOCHs
@@ -413,3 +417,4 @@ class DWX_Info_API(DWX_API):
         return _candles
     
     ######################################################################### 
+        
