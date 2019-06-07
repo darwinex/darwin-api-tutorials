@@ -23,6 +23,63 @@ class DWX_Graphics_Helpers():
     def __init__(self):
         pass
     
+    ##########################################################################
+    
+    def _generate_scatter_list_(self, _df):
+        return [go.Scatter(
+                        x = _df.index,
+                        y = _df[_darwin],
+                        name = _darwin) 
+                    for _darwin in _df.columns]
+    
+    ##########################################################################
+    
+    def _plotly_multi_scatter_(self, 
+                                  _data=None,
+                                  _updatemenus=None,
+                                  _title=None,
+                                  _legend=None,
+                                  _dir_prefix='../MISC/',
+                                  _x_title='Date / Time',
+                                  _y_title='Quote'):
+        
+        # Setup Layout
+        _layout = go.Layout(
+            title=_title,
+            showlegend=_legend,
+            updatemenus=_updatemenus,
+            xaxis=dict(                
+                title=_x_title,
+                titlefont=dict(
+                    family='Courier New, monospace',
+                    size=18,
+                    color='#ffffff'
+                )
+            ),
+            yaxis=dict(
+                title=_y_title,
+                titlefont=dict(
+                    family='Courier New, monospace',
+                    size=18,
+                    color='#ffffff'
+                )
+            ),
+            hoverlabel = dict(namelength = -1),
+            images=[dict(
+                #source="https://d139oolcsxoepg.cloudfront.net/2_108_0/images/logos/darwinex/logo-darwinex.svg",
+                source="https://avatars2.githubusercontent.com/u/26509507?s=460&v=4",
+                xref="paper", yref="paper",
+                x=1.04, y=0.99,
+                sizex=0.105, sizey=0.105,
+                xanchor="left", yanchor="bottom"
+              )]
+        )
+            
+        fig = go.Figure(data=_data, layout=_layout)
+        po.plot(fig, filename=_dir_prefix + f'{_title.replace(" ", "-")}.html')
+    
+    ##########################################################################
+        
     # Single Series Scatter Chart
     def _plotly_dataframe_scatter_(self, 
                         _custom_filename='',
@@ -37,11 +94,17 @@ class DWX_Graphics_Helpers():
                         _annotations=[]):
         
         if _df is not None:
+            
+            _data = self._generate_scatter_list_(_df)
+            
+            """
             _data = [go.Scatter(
                         x = _df.index,
                         y = _df[_darwin],
                         name = _darwin) 
                     for _darwin in _df.columns]
+            """
+            
             
         else:
             print('[ERROR] Can\'t plot thin air I\'m afraid... :)')
