@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: May 16, 2019
+    Last Updated: June 14, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
@@ -14,7 +14,6 @@
     You may obtain a copy of the License at:    
     https://opensource.org/licenses/BSD-3-Clause
 """
-
 import os, requests
 os.chdir('<INSERT-PATH-TO-PROJECT-DIR-HERE>')
 
@@ -26,7 +25,7 @@ class DWX_API(object):
     def __init__(self, 
                  _api_url='https://api.darwinex.com',
                  _api_name='darwininfo',
-                 _version=1.4):
+                 _version=1.5):
         
         # OAuth2 object for access/refresh token retrieval
         self._auth = DWX_OAuth2(load_config('CONFIG/creds_sample.cfg'))
@@ -46,7 +45,7 @@ class DWX_API(object):
     """
     Call any endpoint provided in the Darwinex API documentation, and get JSON.
     """
-    def _Call_API_(self, _endpoint, _type, _data):
+    def _Call_API_(self, _endpoint, _type, _data, _json=True, _stream=False):
         
         # If 
         if _type not in ['GET','POST']:
@@ -65,12 +64,25 @@ class DWX_API(object):
                     print('Data is empty..')
                     return None
                 
-                _ret = requests.post(self._url + _endpoint,
-                                     data=_data,
-                                     headers = self._post_headers,
-                                     verify=True)
+                # For DARWIN Quotes API
+                if _stream:
+                    
+                    # Add POST header for streaming quotes        
+                    self._post_headers['connection'] = 'keep-alive'
+                    return requests.Request('POST',
+                                           self._url + _endpoint,
+                                           headers=self._post_headers,
+                                           data=_data)
+                else:
+                    _ret = requests.post(self._url + _endpoint,
+                                         data=_data,
+                                         headers = self._post_headers,
+                                         verify=True)
         
-            return _ret.json()
+            if _json:
+                return _ret.json()
+            else:
+                return _ret
         
         except Exception as ex:
             print('Type: {0}, Args: {1!r}'.format(type(ex).__name__, ex.args))
