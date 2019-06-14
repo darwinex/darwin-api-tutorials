@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: May 16, 2019
+    Last Updated: June 14, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
@@ -14,14 +14,53 @@
     You may obtain a copy of the License at:    
     https://opensource.org/licenses/BSD-3-Clause
 """
-
 import plotly.offline as po
 import plotly.graph_objs as go
+import matplotlib.ticker as ticker
 
 class DWX_Graphics_Helpers():
     
     def __init__(self):
         pass
+    
+    ##########################################################################
+        
+    def _mpl_plot_axis_(self, _plt, _ax, _df, _darwin, 
+                          _x_title, _y_title, _line_color,
+                          _line_width, _tail_max,
+                          _bgcolor, _tfont):
+        
+        # Matplotlib y-axis formatter
+        @ticker.FuncFormatter
+        def major_formatter(x, pos):
+            return "%.2f" % x
+        
+        _ax.cla()
+        _ax.set_title(_darwin, **_tfont)
+        _ax.set_facecolor(_bgcolor)
+            
+        _ax.ticklabel_format(useOffset=False)
+        _ax.yaxis.set_major_formatter(major_formatter)
+        _ax.yaxis.set_major_formatter(major_formatter)
+
+        _ax.set_xticklabels([])
+        _ax.set_xlabel(_x_title, **_tfont)
+        _ax.set_ylabel(_y_title, **_tfont)
+        
+        _ax.set_ylim(bottom=_df[_darwin].tail(_tail_max).min() - 0.01,
+                                              top=_df[_darwin].tail(_tail_max).max() + 0.01)
+                
+        _ax.plot(_df.tail(_tail_max).index, 
+                  _df[_darwin].tail(100).values,
+                  color=_line_color,
+                  linewidth=_line_width)
+                  #marker='.')
+        
+        _ax.grid(linestyle='-', linewidth='0.5', color='grey')
+        
+        _plt.tight_layout() 
+        _plt.pause(0.01)
+        
     
     ##########################################################################
     
@@ -142,3 +181,68 @@ class DWX_Graphics_Helpers():
         else:
             po.plot(fig, filename=_dir_prefix + _main_title + '.html')
         
+    ##########################################################################
+    
+    def _plotly_scatter_y2(self, 
+                           _custom_filename='',
+                           _t1_data=None, _t2_data=None,
+                           _x1=None, _y1=None, _x1_title=None, 
+                           _y1_range=None, _y1_title=None,_x2=None, 
+                           _y2=None, _x2_title=None, _y2_range=None, 
+                           _y2_title=None, _main_title=None,
+                           _annotations=[]):
+        
+        if _t1_data is None or _t2_data is None:
+            print('[ÈRROR] You must provide lists of Scatter objects to proceed.')
+            return None
+        
+        _data = _t1_data + _t2_data
+        
+        _layout = go.Layout(
+                
+            title=_main_title,
+            xaxis=dict(
+                title=_x1_title,
+                titlefont=dict(
+                    family='Courier New, monospace',
+                    size=18,
+                    color='#7f7f7f'
+                )
+            ),
+             
+            yaxis=dict(
+                title=_y1_title,
+                titlefont=dict(
+                    family='Courier New, monospace',
+                    size=18,
+                    color='#7f7f7f'
+                )
+                # overlaying='y',
+                # side='left'
+            ),
+                
+            yaxis2=dict(
+                title=_y2_title,
+                titlefont=dict(
+                    family='Courier New, monospace',
+                    size=18,
+                    color='#7f7f7f'
+                ),
+                overlaying='y',
+                #range=_y2_range,
+                side='right'
+            ),
+            hoverlabel = dict(namelength = -1),
+            annotations=_annotations
+        )
+                
+        fig = go.Figure(data=_data, layout=_layout)
+        
+        if _custom_filename != '':
+            po.plot(fig, filename=_custom_filename)
+        else:
+            po.plot(fig, filename=_main_title + '.html')
+            
+        #po.plot(_fig, filename=self._reports_dir_prefix + _main_title + '.html')
+        
+    #########################################################################
