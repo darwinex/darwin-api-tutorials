@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: June 14, 2019
+    Last Updated: June 20, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
@@ -64,12 +64,29 @@ class DWX_Graphics_Helpers():
     
     ##########################################################################
     
+    def _generate_scatter_single_(self, _df, _name):
+        return go.Scatter(
+                        x = _df.index,
+                        y = _df,
+                        name = _name)
+        
     def _generate_scatter_list_(self, _df):
+        
+        return [self._generate_scatter_single_(
+                        _df = _df[_darwin],
+                        _name = _darwin
+                    ) for _darwin in _df.columns]
+        
+        """
         return [go.Scatter(
                         x = _df.index,
                         y = _df[_darwin],
                         name = _darwin) 
                     for _darwin in _df.columns]
+        """
+        
+    ##########################################################################
+    
     
     ##########################################################################
     
@@ -123,27 +140,17 @@ class DWX_Graphics_Helpers():
     def _plotly_dataframe_scatter_(self, 
                         _custom_filename='',
                         _dir_prefix='../MISC/',
-                        _df=None, 
-                        _x=None, 
-                        _y=None,
+                        _df=None,
                         _name='',
                         _x_title='Date / Time', 
                         _y_title='Quote', 
                         _main_title='DWX_Info_API: def _Get_Quotes_() Example',
-                        _annotations=[]):
+                        _annotations=[],
+                        _plot_only=False):
         
         if _df is not None:
             
             _data = self._generate_scatter_list_(_df)
-            
-            """
-            _data = [go.Scatter(
-                        x = _df.index,
-                        y = _df[_darwin],
-                        name = _darwin) 
-                    for _darwin in _df.columns]
-            """
-            
             
         else:
             print('[ERROR] Can\'t plot thin air I\'m afraid... :)')
@@ -175,11 +182,14 @@ class DWX_Graphics_Helpers():
         # Create figure
         fig = go.Figure(data=_data, layout=_layout)
         
-        # Set output filename and plot
-        if _custom_filename != '':
-            po.plot(fig, filename=_dir_prefix + _custom_filename)
+        if _plot_only:
+            po.iplot(fig)
         else:
-            po.plot(fig, filename=_dir_prefix + _main_title + '.html')
+            # Set output filename and plot
+            if _custom_filename != '':
+                po.plot(fig, filename=_dir_prefix + _custom_filename)
+            else:
+                po.plot(fig, filename=_dir_prefix + _main_title + '.html')
         
     ##########################################################################
     
