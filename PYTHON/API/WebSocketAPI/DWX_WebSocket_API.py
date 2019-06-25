@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    DWX Quotes API - Subclass of DWX_API for Quotes Streaming
+    DWX WebSocket API - Subclass of DWX_API for Quotes Streaming
     --
     @author: Darwinex Labs (www.darwinex.com)
     
@@ -16,7 +16,7 @@
 """
 
 import os
-os.chdir('E:/DARWIN_API_TUTORIALS/PYTHON/')
+os.chdir('<INSERT-ROOT-PROJECT-DIRECTORY-HERE>')
 
 from API.dwx_api import DWX_API
 import websockets, json, asyncio
