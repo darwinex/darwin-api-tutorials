@@ -25,10 +25,16 @@ class DWX_API(object):
     def __init__(self, 
                  _api_url='https://api.darwinex.com',
                  _api_name='darwininfo',
-                 _version=1.5):
+                 _version=1.5,
+                 _demo=False):
         
         # OAuth2 object for access/refresh token retrieval
-        self._auth = DWX_OAuth2(load_config('CONFIG/creds_sample.cfg'))
+        if _demo:
+            _creds_filename = 'CONFIG/creds_demo.cfg'
+        else:
+            _creds_filename = 'CONFIG/creds.cfg'
+            
+        self._auth = DWX_OAuth2(load_config(_creds_filename))
         
         # Construct main production url for tagging endpoints
         self._url = '{}/{}/{}'.format(_api_url, _api_name, _version)
