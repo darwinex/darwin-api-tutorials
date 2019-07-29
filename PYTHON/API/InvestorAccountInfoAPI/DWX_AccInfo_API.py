@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: July 25, 2019
+    Last Updated: July 29, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
@@ -15,7 +15,7 @@
     https://opensource.org/licenses/BSD-3-Clause
 """
 import os
-os.chdir('<INSERT-PROJECT-ROOT-DIR-HERE>')
+os.chdir('<INSERT-PATH-TO-PROJECT-DIR-HERE>')
 
 from API.dwx_api import DWX_API
 
@@ -107,7 +107,7 @@ class DWX_AccInfo_API(DWX_API):
     
     def _Get_Conditional_Orders_by_Status_(self, 
                                            _id=0, 
-                                           _darwin='PLF.4.1',
+                                           _darwin='',
                                            _status='pending',
                                            _page=0,
                                            _perpage=1):
@@ -119,8 +119,8 @@ class DWX_AccInfo_API(DWX_API):
                 return self._Call_API_(_endpoint='/investoraccounts/' 
                                        + str(_id)
                                        + '/conditionalorders/'
-                                       + _status
-                                       + '?productName=' + _darwin
+                                       + str(_status)
+                                       + '?productName=' + str(_darwin)
                                        + '&page=' + str(_page)
                                        + '&per_page=' + str(_perpage),
                                        _type='GET', _data='')
@@ -161,7 +161,7 @@ class DWX_AccInfo_API(DWX_API):
             return self._Call_API_(_endpoint='/investoraccounts/' 
                                    + str(_id)
                                    + '/orders/executed'
-                                   + '?productName=' + _darwin
+                                   + '?productName=' + str(_darwin)
                                    + '&page=' + str(_page)
                                    + '&per_page=' + str(_perpage),
                                    _type='GET', _data='')
@@ -187,7 +187,7 @@ class DWX_AccInfo_API(DWX_API):
                                        + str(_id)
                                        + '/trades/'
                                        + _status
-                                       + '?productName=' + _darwin
+                                       + '?productName=' + str(_darwin)
                                        + '&page=' + str(_page)
                                        + '&per_page=' + str(_perpage),
                                        _type='GET', _data='')
