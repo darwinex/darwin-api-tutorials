@@ -4,7 +4,7 @@
     --
     @author: Darwinex Labs (www.darwinex.com)
     
-    Last Updated: June 14, 2019
+    Last Updated: June 29, 2019
     
     Copyright (c) 2017-2019, Darwinex. All rights reserved.
     
@@ -54,7 +54,7 @@ class DWX_API(object):
     def _Call_API_(self, _endpoint, _type, _data, _json=True, _stream=False):
         
         # If 
-        if _type not in ['GET','POST']:
+        if _type not in ['GET','POST','PUT', 'DELETE']:
             print('Bad request type')
             return None
         
@@ -64,7 +64,16 @@ class DWX_API(object):
                 _ret = requests.get(self._url + _endpoint,
                                     headers=self._auth_headers,
                                     verify=True)
-                
+            elif _type == 'PUT':
+                _ret = requests.put(self._url + _endpoint,
+                                    headers=self._post_headers,
+                                    data=_data,
+                                    verify=True)
+            elif _type == 'DELETE':
+                _ret = requests.delete(self._url + _endpoint,
+                                       headers=self._auth_headers,
+                                       #data=_data,
+                                       verify=True)
             else:
                 if len(_data) == 0:
                     print('Data is empty..')
