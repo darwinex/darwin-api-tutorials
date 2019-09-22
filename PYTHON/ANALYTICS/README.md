@@ -12,6 +12,7 @@ port=21
 ```
 
 This filepath must then be passed to the `__init__` function of the class:
+
 `def __init__(self, config='CONFIG/your-chosen-filename.cfg')`
 
 ### Python module requirements
