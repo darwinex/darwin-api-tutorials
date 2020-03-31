@@ -489,7 +489,7 @@ class dwx_data_analytics():
                 
                     # Finalize filenames
                     quote_files += [f'{darwin}/quotes/{root}/{root_file}'\
-                                    for root_file in root_files if suffix in root_file]
+                                    for root_file in root_files if '{}.{}'.format(darwin, suffix) in root_file]
                 except Exception as ex:
                     print(ex)
                     return
@@ -502,7 +502,7 @@ class dwx_data_analytics():
             try:
                 self.server.retrlines(f'NLST {darwin}/quotes/{year}-{month}/', quote_files.append)
                 quote_files = [f'{darwin}/quotes/{year}-{month}/{quote_file}'\
-                                    for quote_file in quote_files if suffix in quote_file]
+                                    for quote_file in quote_files if '{}.{}'.format(darwin, suffix) in quote_file]
             except Exception as ex:
                 print(ex)
                 return
