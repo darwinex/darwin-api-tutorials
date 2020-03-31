@@ -15,6 +15,7 @@
     https://opensource.org/licenses/BSD-3-Clause
 """
 import gzip
+import json
 import pandas as pd
 from tqdm import tqdm
 from ftplib import FTP
@@ -83,6 +84,21 @@ class dwx_data_analytics():
                 
     ##########################################################################
     
+    """Parse a line containing a list. 
+    
+    Only works for max one list or one list of lists. 
+    
+    """
+    
+    def parse_line(self, line):
+        for start, end in [['[[', ']]'], ['[', ']']]:
+            if start in line:
+                ls = line.split(start)
+                ls1 = ls[1].split(end)
+                return ls[0].split(',')[:-1] + [json.loads(start+ls1[0].replace("'", '"')+end)] + ls1[1].split(',')[1:]
+        return line.split(',')
+    
+    
     def get_data_from_ftp(self, darwin, data_type):
         
         """Connect to FTP server and download requested data for DARWIN.
@@ -117,7 +133,7 @@ class dwx_data_analytics():
         while True:
             line = self.retbuf.readline()
             if len(line) > 1:
-                ret.append(line.strip().decode().split(','))
+                ret.append(self.parse_line(line.strip().decode()))
             else:
                 break
         
